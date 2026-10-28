@@ -104,6 +104,9 @@
   .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
   .btn-secondary:hover:not(:disabled) { background: var(--ring); }
 
+  .btn-danger { background: transparent; color: #f87171; border-color: rgba(239,68,68,0.3); }
+  .btn-danger:hover:not(:disabled) { background: rgba(239,68,68,0.08); }
+
   .stack > * + * { margin-top: 0.7rem; }
 
   #lockError {
@@ -192,6 +195,7 @@
   <div id="ipBox"><span class="ip-label">Address</span><span class="ip-val" id="ipVal"></span></div>
   <div class="stack">
     <button class="btn-accent" id="startBtn" disabled>Start</button>
+    <button class="btn-danger" id="stopBtn" style="display:none">Stop</button>
     <button class="btn-secondary" id="checkBtn">Check status</button>
   </div>
   <div id="statusText"></div>
@@ -210,6 +214,7 @@
   const ipBox = document.getElementById("ipBox");
   const ipVal = document.getElementById("ipVal");
   const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
   const checkBtn = document.getElementById("checkBtn");
   const statusText = document.getElementById("statusText");
 
@@ -219,6 +224,9 @@
       badge.innerHTML = '<span class="dot"></span>Running';
       startBtn.disabled = true;
       startBtn.textContent = "Running";
+      stopBtn.style.display = "block";
+      stopBtn.disabled = false;
+      stopBtn.textContent = "Stop";
       if (ip) {
         ipBox.style.display = "flex";
         ipVal.textContent = ip + ":25565";
@@ -228,18 +236,23 @@
       badge.innerHTML = '<span class="dot"></span>Starting';
       startBtn.disabled = true;
       startBtn.textContent = "Starting…";
+      stopBtn.style.display = "none";
       ipBox.style.display = "none";
       statusText.textContent = "Usually takes 1–2 minutes.";
     } else if (state === "stopping") {
       badge.innerHTML = '<span class="dot"></span>Stopping';
       startBtn.disabled = true;
       startBtn.textContent = "Stopping…";
+      stopBtn.style.display = "block";
+      stopBtn.disabled = true;
+      stopBtn.textContent = "Stopping…";
       ipBox.style.display = "none";
       statusText.textContent = "";
     } else {
       badge.innerHTML = '<span class="dot"></span>Offline';
       startBtn.disabled = false;
       startBtn.textContent = "Start";
+      stopBtn.style.display = "none";
       ipBox.style.display = "none";
       statusText.textContent = "Nobody's playing right now.";
     }
@@ -294,6 +307,7 @@
   unlockBtn.addEventListener("click", tryUnlock);
   pwInput.addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(); });
   startBtn.addEventListener("click", () => poll("start"));
+  stopBtn.addEventListener("click", () => poll("stop"));
   checkBtn.addEventListener("click", () => poll("status"));
 
   if (TOKEN) {
